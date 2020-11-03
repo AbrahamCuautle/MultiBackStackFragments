@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".HomeTwoFragment">
+    tools:context=".home.HomeTwoFragment">
 
     <!-- TODO: Update blank fragment layout -->
     <TextView
@@ -19,7 +19,7 @@
         android:id="@+id/btnHomeTwo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Go to Frgament Three"
+        android:text="Go to Fragment Three"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"

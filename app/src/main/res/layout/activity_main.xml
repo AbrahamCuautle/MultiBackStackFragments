@@ -19,6 +19,7 @@
         android:layout_height="wrap_content"
         app:menu="@menu/bottom_navigation_items"
         app:backgroundTint="@android:color/white"
+        app:labelVisibilityMode="labeled"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

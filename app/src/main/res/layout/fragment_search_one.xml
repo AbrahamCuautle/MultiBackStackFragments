@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".cart.CartOneFragment">
+    tools:context=".search.SearchOneFragment">
 
     <!-- TODO: Update blank fragment layout -->
     <TextView
@@ -13,10 +13,10 @@
         android:layout_height="wrap_content"
         android:textAlignment="center"
         android:textSize="20sp"
-        android:text="Cart One" />
+        android:text="Search One" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnCartOne"
+        android:id="@+id/btnSearchOne"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Go to Fragment Two"

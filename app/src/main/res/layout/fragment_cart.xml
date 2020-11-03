@@ -3,11 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".home.HomeFragment">
+    tools:context=".cart.CartFragment">
 
     <!-- TODO: Update blank fragment layout -->
     <FrameLayout
-        android:id="@+id/homeContainer"
+        android:id="@+id/cartContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 

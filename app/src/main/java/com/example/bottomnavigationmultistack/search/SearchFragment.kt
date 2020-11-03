@@ -1,10 +1,12 @@
-package com.example.bottomnavigationmultistack
+package com.example.bottomnavigationmultistack.search
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.example.bottomnavigationmultistack.R
+import com.example.bottomnavigationmultistack.home.HomeOneFragment
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -13,13 +15,15 @@ private const val ARG_PARAM2 = "param2"
 
 /**
  * A simple [Fragment] subclass.
- * Use the [CartTwoFragment.newInstance] factory method to
+ * Use the [SearchFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class CartTwoFragment : Fragment() {
+class SearchFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
+
+    var isAddedSearchOneFragment = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,7 +38,18 @@ class CartTwoFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_cart_two, container, false)
+        return inflater.inflate(R.layout.fragment_search, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        if (!isAddedSearchOneFragment && savedInstanceState == null) {
+            childFragmentManager.beginTransaction().run {
+                replace(R.id.searchContainer, SearchOneFragment(), SearchOneFragment.TAG)
+                commit()
+            }
+            isAddedSearchOneFragment = true
+        }
     }
 
     companion object {
@@ -44,12 +59,15 @@ class CartTwoFragment : Fragment() {
          *
          * @param param1 Parameter 1.
          * @param param2 Parameter 2.
-         * @return A new instance of fragment CartTwoFragment.
+         * @return A new instance of fragment SearchFragment.
          */
         // TODO: Rename and change types and number of parameters
+
+        val TAG = SearchFragment::class.java.canonicalName
+
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
-            CartTwoFragment().apply {
+            SearchFragment().apply {
                 arguments = Bundle().apply {
                     putString(ARG_PARAM1, param1)
                     putString(ARG_PARAM2, param2)

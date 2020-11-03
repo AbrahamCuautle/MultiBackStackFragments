@@ -1,10 +1,11 @@
-package com.example.bottomnavigationmultistack
+package com.example.bottomnavigationmultistack.home
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.example.bottomnavigationmultistack.R
 import kotlinx.android.synthetic.main.fragment_home_two.*
 
 // TODO: Rename parameter arguments, choose names that match

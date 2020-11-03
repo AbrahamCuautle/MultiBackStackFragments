@@ -2,37 +2,48 @@ package com.example.bottomnavigationmultistack
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.PersistableBundle
-import android.util.Log
+import android.view.MenuItem
+import androidx.collection.SparseArrayCompat
 import androidx.fragment.app.Fragment
+import com.example.bottomnavigationmultistack.cart.CartFragment
+import com.example.bottomnavigationmultistack.home.HomeFragment
+import com.example.bottomnavigationmultistack.search.SearchFragment
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.android.synthetic.main.activity_main.*
-import java.util.ArrayList
+import java.lang.IllegalStateException
+import java.util.*
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener {
 
-    var backStack = ArrayList<String?>()
+    private var bottomNavigationBackStack = ArrayList<String?>()
+
+    private val fragmentItemIds = SparseArrayCompat<String?>()
+
+    init {
+        fragmentItemIds.put(R.id.inicio, HomeFragment.TAG)
+        fragmentItemIds.put(R.id.buscar, SearchFragment.TAG)
+        fragmentItemIds.put(R.id.carrito, CartFragment.TAG)
+        fragmentItemIds.put(R.id.cuenta, ProfileOneFragment.TAG)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        bottomNavigation.setOnNavigationItemSelectedListener {
-            replaceBottomNavigationFragment(it.itemId)
-            true
-        }
+        bottomNavigation.setOnNavigationItemSelectedListener(this)
 
         if (savedInstanceState == null) {
             replaceFragment(getHomeFragment(), HomeFragment.TAG)
             reorderBackStack(HomeFragment.TAG)
         } else {
-            backStack = savedInstanceState.getStringArrayList("FRAGMENTS") ?: return
+            bottomNavigationBackStack = savedInstanceState.getStringArrayList("FRAGMENTS") ?: return
         }
 
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putStringArrayList("FRAGMENTS", backStack)
+        outState.putStringArrayList("FRAGMENTS", bottomNavigationBackStack)
     }
 
     override fun onBackPressed() {
@@ -41,14 +52,15 @@ class MainActivity : AppCompatActivity() {
         val backStackEntryCount = lastFragment.childFragmentManager.backStackEntryCount
 
         if (backStackEntryCount == 0) {
-            if (backStack.size == 1) {
+            if (bottomNavigationBackStack.size == 1) {
                 finish()
             } else {
-                backStack.removeLast()
-                val tag = backStack.last()
+                bottomNavigationBackStack.removeLast()
+                val tag = bottomNavigationBackStack.last()
 
                 val fragment = supportFragmentManager.findFragmentByTag(tag) ?: return
 
+                selectBottomNavigationItem(getItemId(tag))
                 replaceFragment(fragment, tag)
 
             }
@@ -56,63 +68,97 @@ class MainActivity : AppCompatActivity() {
             lastFragment.childFragmentManager.popBackStack()
         }
 
+    }
 
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        selectBottomNavigationItem(item.itemId)
+        replaceBottomNavigationFragment(item.itemId)
+        return false
+    }
+
+    fun selectBottomNavigationItem(itemId: Int) {
+        bottomNavigation.setOnNavigationItemSelectedListener(null)
+        bottomNavigation.selectedItemId = itemId
+        bottomNavigation.setOnNavigationItemSelectedListener(this)
     }
 
     fun replaceBottomNavigationFragment(itemId: Int) {
-        when(itemId){
-            R.id.item1 -> {
-                reorderBackStack(HomeFragment.TAG)
-                replaceFragment(getHomeFragment(), HomeFragment.TAG)
-            }
-            R.id.item2 -> {
-                reorderBackStack(CartOneFragment.TAG)
-                replaceFragment(getCartFragment(), CartOneFragment.TAG)
-            }
-            R.id.item3 -> {
-                reorderBackStack(ProfileOneFragment.TAG)
-                replaceFragment(getProfileFragment(), ProfileOneFragment.TAG)
-            }
+        val tag = fragmentItemIds.get(itemId)
+        reorderBackStack(tag)
+
+        val fragment = getOrCreateFragment(itemId)
+        replaceFragment(fragment, tag)
+    }
+
+    private fun getItemId(tag: String?): Int {
+        return when(tag) {
+            HomeFragment.TAG -> R.id.inicio
+            SearchFragment.TAG -> R.id.buscar
+            CartFragment.TAG -> R.id.carrito
+            ProfileOneFragment.TAG -> R.id.cuenta
+            else -> throw IllegalStateException("No id found")
         }
     }
 
-    fun getHomeFragment(): Fragment {
+    private fun getOrCreateFragment(itemId: Int): Fragment {
+        return when(itemId){
+            R.id.inicio -> {
+                getHomeFragment()
+            }
+            R.id.buscar -> {
+                getSearchFragment()
+            }
+            R.id.carrito -> {
+                getCartFragment()
+            }
+            R.id.cuenta -> {
+                getProfileFragment()
+            }
+            else -> throw IllegalStateException("No Fragment found")
+        }
+    }
+
+    private fun getHomeFragment(): Fragment {
         return supportFragmentManager.findFragmentByTag(HomeFragment.TAG) ?: HomeFragment()
     }
 
-    fun getCartFragment(): Fragment {
-        return supportFragmentManager.findFragmentByTag(CartOneFragment.TAG) ?: CartOneFragment()
+    private fun getSearchFragment(): Fragment {
+        return supportFragmentManager.findFragmentByTag(SearchFragment.TAG) ?: SearchFragment()
     }
 
-    fun getProfileFragment(): Fragment {
+    private fun getCartFragment(): Fragment {
+        return supportFragmentManager.findFragmentByTag(CartFragment.TAG) ?: CartFragment()
+    }
+
+    private fun getProfileFragment(): Fragment {
         return supportFragmentManager.findFragmentByTag(ProfileOneFragment.TAG) ?: ProfileOneFragment()
     }
 
-    fun reorderBackStack(tag: String?) {
-        val name = backStack.find { it == tag }
+    private fun reorderBackStack(tag: String?) {
+        val name = bottomNavigationBackStack.find { it == tag }
         if (name == null) {
-            backStack.add(tag)
+            bottomNavigationBackStack.add(tag)
         } else {
-            backStack.remove(name)
-            backStack.add(name)
+            bottomNavigationBackStack.remove(name)
+            bottomNavigationBackStack.add(name)
         }
     }
 
-    fun addedToBackStack(tag: String?) : Boolean {
+    private fun fragmentNeedsToBeAddedToBackStack(tag: String?) : Boolean {
         return supportFragmentManager.findFragmentByTag(tag) == null
     }
 
-    fun replaceFragment(fragment: Fragment, tag: String?) {
+    private fun replaceFragment(fragment: Fragment, tag: String?) {
         supportFragmentManager.beginTransaction().run {
             replace(R.id.container, fragment, tag)
-            if (addedToBackStack(tag)) {
+            if (fragmentNeedsToBeAddedToBackStack(tag)) {
                 addToBackStack(tag)
             }
             commit()
         }
     }
 
-    fun <T> ArrayList<T>.removeLast() {
+    private fun <T> ArrayList<T>.removeLast() {
         removeAt(lastIndex)
     }
 
